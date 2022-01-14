@@ -73,6 +73,7 @@ class Dispatcher(Cog):
             avatar_url=message.author.display_avatar.url,
             allowed_mentions=AllowedMentions(roles=False, everyone=False),
             wait=True,
+            **kwargs,
         )
 
         assert msg.guild
