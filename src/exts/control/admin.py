@@ -141,7 +141,12 @@ class Admin(Cog):
 
         embed.set_author(name="System", icon_url="https://cdn.discordapp.com/emojis/931546588235595796.png")
 
-        await self.bot.get_cog("Dispatcher").raw_post(cids, embeds=[embed])  # type: ignore
+        await self.bot.get_cog("Dispatcher").raw_post(  # type: ignore
+            cids,
+            embeds=[embed],
+            username="CrossChat",
+            avatar_url=self.bot.user.display_avatar.url,
+        )
 
         await itr.send(f"Announced to {channel} ({len(cids)} subchannels)", ephemeral=True)
 

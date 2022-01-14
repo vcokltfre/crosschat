@@ -12,7 +12,7 @@ def main() -> None:
     intents.members = True
     intents.guild_messages = True
 
-    bot = Bot(intents=intents)
+    bot = Bot(intents=intents, test_guilds=[683009037830324235])
 
     for ext in [
         "src.exts.errors",
