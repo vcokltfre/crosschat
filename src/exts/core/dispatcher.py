@@ -80,7 +80,7 @@ class Dispatcher(Cog):
             message.content,
             username=message.author.name + user.badges,
             avatar_url=message.author.display_avatar.url,
-            allowed_mentions=AllowedMentions(roles=False, everyone=False),
+            allowed_mentions=AllowedMentions(roles=False, everyone=False, users=False),
             wait=True,
             **kwargs,
         )
