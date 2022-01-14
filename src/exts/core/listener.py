@@ -26,10 +26,11 @@ class Listener(Cog):
         logger.info(f"Updated channel mapping info for {cmap.channel_id} -> {cmap.channel.id}")
 
     @Cog.listener()
-    async def on_channel_unmapped(self, channel_id: int) -> None:
-        self.mapping.pop(channel_id, None)
+    async def on_channel_unmapped(self, cmap: ChannelMap) -> None:
+        self.mapping.pop(cmap.channel_id, None)
+        self.backmap[cmap.channel.id].remove(cmap.channel_id)
 
-        logger.info(f"Removed channel mapping info for {channel_id}")
+        logger.info(f"Removed channel mapping info for {cmap.channel_id}")
 
     @loop(minutes=1)
     async def cache_loop(self) -> None:

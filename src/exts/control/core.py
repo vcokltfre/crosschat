@@ -40,6 +40,28 @@ class Core(Cog):
 
         await itr.send(f"Mapped channel {itr.channel.id} to CC:{channel}")
 
+    @slash_command(
+        name="unlink",
+        description="Unlink a channel from CrossChat",
+    )
+    @is_administrator()
+    async def unlink(
+        self,
+        itr: CommandInteraction,
+        channel: str = Param(desc="The CrossChat channel to unlink"),
+    ) -> None:
+        try:
+            cmap = await ChannelMap.objects.first(channel_id=itr.channel.id)
+        except NoMatch:
+            await itr.send(f"This channel is not linked.", ephemeral=True)
+            return
+
+        await cmap.delete()
+
+        await itr.send(f"Unlinked channel {itr.channel.id} from CC:{channel}")
+
+        self.bot.dispatch("channel_unmapped", cmap)
+
 
 def setup(bot: Bot) -> None:
     bot.add_cog(Core(bot))
