@@ -40,9 +40,9 @@ class User(Model):
     def badges(self) -> str:
         if self.user_flags.DEVELOPER:
             return " ⚙️"
-        if self.user_flags.MODERATOR:
-            return " 🔨"
         if self.user_flags.ADMIN:
             return " ⚒️"
+        if self.user_flags.MODERATOR:
+            return " 🔨"
 
         return ""
