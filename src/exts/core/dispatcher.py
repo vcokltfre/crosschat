@@ -1,6 +1,6 @@
 from asyncio import create_task
 
-from disnake import Member
+from disnake import AllowedMentions, Member
 from disnake import Message as DiscordMessage
 from disnake import TextChannel
 from disnake import User as DiscordUser
@@ -58,6 +58,7 @@ class Dispatcher(Cog):
             message.content,
             username=message.author.name + user.badges,
             avatar_url=message.author.display_avatar.url,
+            allowed_mentions=AllowedMentions(roles=False, everyone=False),
             wait=True,
         )
 
