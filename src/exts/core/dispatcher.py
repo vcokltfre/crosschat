@@ -83,7 +83,7 @@ class Dispatcher(Cog):
             ]  # type: ignore
 
             kwargs["embeds"][0].set_author(
-                name=str(message.reference.resolved.author),  # type: ignore
+                name=message.reference.resolved.author.name,  # type: ignore
                 icon_url=message.reference.resolved.author.display_avatar.url,  # type: ignore
                 url=message.reference.resolved.jump_url,  # type: ignore
             )
