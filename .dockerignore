@@ -8,4 +8,4 @@
 # Include source
 !src/*
 !alembic/*
-alembic.ini
+!alembic.ini
