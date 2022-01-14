@@ -1,0 +1,10 @@
+# Ignore all
+*
+
+# Include poetry
+!poetry.lock
+!pyproject.toml
+
+# Include source
+!src/*
+!alembic/*
