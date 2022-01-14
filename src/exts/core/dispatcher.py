@@ -1,6 +1,6 @@
 from asyncio import create_task
 
-from disnake import AllowedMentions, Member
+from disnake import AllowedMentions, Embed, Member
 from disnake import Message as DiscordMessage
 from disnake import TextChannel
 from disnake import User as DiscordUser
@@ -53,6 +53,19 @@ class Dispatcher(Cog):
             hooks = await channel.webhooks() or [await channel.create_webhook(name="CrossChat")]
 
         self.webhook_cache[channel_id] = hooks
+
+        kwargs = {}
+
+        if message.reference:
+            kwargs["embeds"] = [
+                Embed(
+                    title=f"Replying to {message.reference.resolved.author}",  # type: ignore
+                    description=message.content[:250],
+                    url=message.reference.resolved.jump_url,  # type: ignore
+                )
+            ]
+
+            kwargs["embeds"][0].set_author(name=message.author, icon_url=message.author.display_avatar.url)
 
         msg = await hooks[0].send(
             message.content,
