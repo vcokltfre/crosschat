@@ -60,7 +60,7 @@ class Dispatcher(Cog):
             kwargs["embeds"] = [
                 Embed(
                     title=f"Replying to {message.reference.resolved.author}",  # type: ignore
-                    description=message.content[:250],
+                    description=message.reference.resolved.content[:250],  # type: ignore
                     url=message.reference.resolved.jump_url,  # type: ignore
                 )
             ]
