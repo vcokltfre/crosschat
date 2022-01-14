@@ -121,7 +121,7 @@ class Admin(Cog):
         channel: str = Param(desc="The CrossChat channel to announce to"),
         message: str = Param(desc="The message to announce"),
     ) -> None:
-        await itr.response.defer()
+        await itr.response.defer(ephemeral=True)
 
         try:
             db_channel = await Channel.objects.first(name=channel)
