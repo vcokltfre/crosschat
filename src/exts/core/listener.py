@@ -6,6 +6,8 @@ from loguru import logger
 from src import Bot
 from src.impl.database import Channel, ChannelMap
 
+from ..control.admin import Admin
+
 
 class Listener(Cog):
     def __init__(self, bot: Bot) -> None:
@@ -54,6 +56,15 @@ class Listener(Cog):
         if message.channel.id in self.mapping:
             channel = self.mapping[message.channel.id]
             self.bot.dispatch("channel_message", channel, self.backmap[channel.id], message)
+
+    @Cog.listener()
+    async def on_message_delete(self, message: Message) -> None:
+        if message.channel.id in self.mapping:
+            ac = self.bot.get_cog("Admin")  # type: ignore
+
+            ac: Admin
+
+            await ac.delete_all(message)
 
 
 def setup(bot: Bot) -> None:
