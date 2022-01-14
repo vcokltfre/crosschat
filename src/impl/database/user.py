@@ -38,15 +38,11 @@ class User(Model):
 
     @property
     def badges(self) -> str:
-        badges = []
         if self.user_flags.DEVELOPER:
-            badges.append("⚙️")
+            return " ⚙️"
         if self.user_flags.MODERATOR:
-            badges.append("🔨")
+            return " 🔨"
         if self.user_flags.ADMIN:
-            badges.append("⚒️")
+            return " ⚒️"
 
-        if badges:
-            badges.insert(0, " ")
-
-        return "".join(badges)
+        return ""
