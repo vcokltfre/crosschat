@@ -60,7 +60,7 @@ class Dispatcher(Cog):
             kwargs["embeds"] = [Embed(description=message.reference.resolved.content[:250])]  # type: ignore
 
             kwargs["embeds"][0].set_author(
-                name=message.author,
+                name=str(message.reference.resolved.author),  # type: ignore
                 icon_url=message.reference.resolved.author.display_avatar.url,  # type: ignore
                 url=message.reference.resolved.jump_url,  # type: ignore
             )
