@@ -57,17 +57,12 @@ class Dispatcher(Cog):
         kwargs = {}
 
         if message.reference:
-            kwargs["embeds"] = [
-                Embed(
-                    title=f"Replying to {message.reference.resolved.author}",  # type: ignore
-                    description=message.reference.resolved.content[:250],  # type: ignore
-                )
-            ]
+            kwargs["embeds"] = [Embed(description=message.reference.resolved.content[:250])]  # type: ignore
 
             kwargs["embeds"][0].set_author(
                 name=message.author,
-                icon_url=message.author.display_avatar.url,
-                url=message.reference.resolved.jump_url,
+                icon_url=message.reference.resolved.author.display_avatar.url,  # type: ignore
+                url=message.reference.resolved.jump_url,  # type: ignore
             )
 
         msg = await hooks[0].send(
