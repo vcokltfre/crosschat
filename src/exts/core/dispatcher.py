@@ -36,6 +36,24 @@ class Dispatcher(Cog):
 
         return db_user
 
+    async def raw_post(self, channels: list[int], **kwargs) -> None:
+        for cid in channels:
+            channel = self.bot.get_channel(cid)
+
+            if channel is None:
+                continue
+
+            assert isinstance(channel, TextChannel)
+
+            hooks = self.webhook_cache.get(cid, [])
+
+            if not hooks:
+                hooks = await channel.webhooks() or [await channel.create_webhook(name="CrossChat")]
+
+            self.webhook_cache[cid] = hooks
+
+            await hooks[0].send(**kwargs)
+
     async def post_message(self, message: DiscordMessage, user: User, channel_id: int, cc_channel: Channel) -> None:
         channel = self.bot.get_channel(channel_id)
 

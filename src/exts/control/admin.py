@@ -1,4 +1,4 @@
-from disnake import CommandInteraction
+from disnake import CommandInteraction, Embed
 from disnake import Message as DiscordMessage
 from disnake import User as DiscordUser
 from disnake.ext.commands import Cog, Param, is_owner, message_command, slash_command
@@ -7,7 +7,7 @@ from loguru import logger
 from ormar import NoMatch
 
 from src import Bot
-from src.impl.database import Channel, Message, User
+from src.impl.database import Channel, ChannelMap, Message, User
 from src.impl.utils import is_moderator
 
 
@@ -109,6 +109,41 @@ class Admin(Cog):
                 await self.bot.http.request(route)
             except Exception as e:
                 logger.error(str(e))
+
+    @slash_command(
+        name="announce",
+        description="Announce a message to all channels",
+    )
+    @is_owner()
+    async def announce(
+        self,
+        itr: CommandInteraction,
+        channel: str = Param(desc="The CrossChat channel to announce to"),
+        message: str = Param(desc="The message to announce"),
+    ) -> None:
+        await itr.response.defer()
+
+        try:
+            db_channel = await Channel.objects.first(name=channel)
+        except NoMatch:
+            await itr.send(f"Channel {channel} does not exist.", ephemeral=True)
+            return
+
+        mapped = await ChannelMap.objects.filter(channel=db_channel.id).all()
+
+        cids = [m.channel_id for m in mapped]
+
+        embed = Embed(
+            title="Announcement",
+            description=message,
+            color=0x87CEEB,
+        )
+
+        embed.set_author(name="System", icon_url="https://cdn.discordapp.com/emojis/931546588235595796.png")
+
+        await self.bot.get_cog("Dispatcher").raw_post(cids, embeds=[embed])  # type: ignore
+
+        await itr.send(f"Announced to {channel} ({len(cids)} subchannels)", ephemeral=True)
 
 
 def setup(bot: Bot) -> None:
