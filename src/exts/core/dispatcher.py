@@ -57,13 +57,24 @@ class Dispatcher(Cog):
         kwargs = {}
 
         if message.reference:
-            kwargs["embeds"] = [Embed(description=message.reference.resolved.content[:250])]  # type: ignore
+            kwargs["embeds"] = [
+                Embed(
+                    description=message.reference.resolved.content[:250],
+                    colour=0x87CEEB,
+                )
+            ]  # type: ignore
 
             kwargs["embeds"][0].set_author(
                 name=str(message.reference.resolved.author),  # type: ignore
                 icon_url=message.reference.resolved.author.display_avatar.url,  # type: ignore
                 url=message.reference.resolved.jump_url,  # type: ignore
             )
+
+        if message.attachments and message.attachments[0].content_type.startswith("image/"):
+            embed = Embed(colour=0x87CEEB)
+            embed.set_image(url=message.attachments[0].url)
+
+            kwargs["embeds"] = kwargs.get("embeds", []) + [embed]
 
         msg = await hooks[0].send(
             message.content,
