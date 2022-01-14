@@ -77,7 +77,7 @@ class Dispatcher(Cog):
             kwargs["embeds"] = kwargs.get("embeds", []) + [embed]
 
         msg = await hooks[0].send(
-            message.content[:2000],
+            message.content.replace("[", "\\[")[:2000],
             username=message.author.name + user.badges,
             avatar_url=message.author.display_avatar.url,
             allowed_mentions=AllowedMentions(roles=False, everyone=False, users=False),
