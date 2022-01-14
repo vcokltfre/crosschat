@@ -83,10 +83,14 @@ class Admin(Cog):
         await itr.response.defer(ephemeral=True)
 
         try:
-            db_msg = await Message.objects.first(id=message.id)
+            await self.delete_all(message)
         except NoMatch:
             await itr.send(f"Message {message.id} is not a CrossChat message.", ephemeral=True)
-            return
+
+        await itr.send("Message deleted.", ephemeral=True)
+
+    async def delete_all(self, message: DiscordMessage) -> None:
+        db_msg = await Message.objects.first(id=message.id)
 
         messages = await Message.objects.filter(original_id=db_msg.original_id).all()
 
@@ -105,8 +109,6 @@ class Admin(Cog):
                 await self.bot.http.request(route)
             except Exception as e:
                 logger.error(str(e))
-
-        await itr.send("Message deleted.", ephemeral=True)
 
 
 def setup(bot: Bot) -> None:
