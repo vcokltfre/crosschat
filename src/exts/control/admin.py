@@ -61,6 +61,7 @@ class Admin(Cog):
         name="permissions",
         description="Modify permissions for a user",
     )
+    @is_owner()
     async def permissions(
         self,
         itr: CommandInteraction,
