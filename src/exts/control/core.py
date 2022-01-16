@@ -1,6 +1,5 @@
 from disnake import CommandInteraction, Embed, Thread
 from disnake.ext.commands import Cog, Param, slash_command
-from ormar import NoMatch
 
 from src import Bot
 from src.impl.database import Channel, ChannelMap, Message

@@ -2,7 +2,6 @@ from disnake import CommandInteraction, Embed
 from disnake import User as DiscordUser
 from disnake import Webhook
 from disnake.ext.commands import Cog, Param, is_owner, slash_command
-from loguru import logger
 from ormar import NoMatch
 
 from src import Bot
