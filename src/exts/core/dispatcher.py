@@ -77,7 +77,7 @@ class Dispatcher(Cog):
         if message.reference:
             kwargs["embeds"] = [
                 Embed(
-                    description=message.reference.resolved.content[:250],
+                    description=message.reference.resolved.content[:250],  # type: ignore
                     colour=0x87CEEB,
                 )
             ]  # type: ignore
@@ -88,7 +88,7 @@ class Dispatcher(Cog):
                 url=message.reference.resolved.jump_url,  # type: ignore
             )
 
-        if message.attachments and message.attachments[0].content_type.startswith("image/"):
+        if message.attachments and (message.attachments[0].content_type or "").startswith("image/"):
             embed = Embed(colour=0x87CEEB)
             embed.set_image(url=message.attachments[0].url)
 
