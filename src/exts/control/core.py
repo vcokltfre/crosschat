@@ -1,4 +1,4 @@
-from disnake import CommandInteraction, Embed
+from disnake import CommandInteraction, Embed, Thread
 from disnake.ext.commands import Cog, Param, slash_command
 from ormar import NoMatch
 
@@ -55,15 +55,16 @@ class Core(Cog):
         itr: CommandInteraction,
         channel: str = Param(desc="The CrossChat channel to connect to"),
     ) -> None:
-        try:
-            db_channel = await Channel.objects.first(name=channel)
-        except NoMatch:
-            await itr.send(f"Channel {channel} does not exist.", ephemeral=True)
+        vchannel = self.bot.vchannels.get(channel, None)
+
+        if vchannel is None:
+            await itr.send(f"Channel {channel} does not exist.")
             return
 
-        cmap = await ChannelMap(channel=db_channel, channel_id=itr.channel.id).save()
-
-        self.bot.dispatch("channel_mapped", cmap)
+        if isinstance(itr.channel, Thread):
+            await vchannel.join(itr.channel.parent_id, itr.channel.id)
+        else:
+            await vchannel.join(itr.channel.id)
 
         await itr.send(f"Mapped channel {itr.channel.id} to CC:{channel}")
 
@@ -75,19 +76,16 @@ class Core(Cog):
     async def unlink(
         self,
         itr: CommandInteraction,
-        channel: str = Param(desc="The CrossChat channel to unlink"),
     ) -> None:
-        try:
-            cmap = await ChannelMap.objects.first(channel_id=itr.channel.id)
-        except NoMatch:
-            await itr.send(f"This channel is not linked.", ephemeral=True)
+        vchannel = self.bot.resolve_channel(itr.channel.id)
+
+        if vchannel is None:
+            await itr.send(f"Channel {itr.channel.id} is not linked.")
             return
 
-        await cmap.delete()
+        await vchannel.leave(itr.channel.id)
 
-        await itr.send(f"Unlinked channel {itr.channel.id} from CC:{channel}")
-
-        self.bot.dispatch("channel_unmapped", cmap)
+        await itr.send(f"Unlinked channel {itr.channel.id} from CC:{vchannel.channel.name}")
 
 
 def setup(bot: Bot) -> None:

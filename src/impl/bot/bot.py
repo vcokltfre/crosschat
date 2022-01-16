@@ -5,8 +5,8 @@ from disnake.ext.commands import Bot as _Bot
 from fakeredis.aioredis import FakeRedis
 from loguru import logger
 
-from src.impl.database import database
-from src.impl.utils import SnowflakeGenerator
+from src.impl.core import ChannelManager
+from src.impl.database import Channel, database
 
 
 class Bot(_Bot):
@@ -18,7 +18,19 @@ class Bot(_Bot):
         else:
             self.redis: Redis = from_url(redis_uri)
 
-        self.sf = SnowflakeGenerator(0, 0)
+        self.vchannels: dict[str, ChannelManager] = {}
+        self.ccache: dict[int, ChannelManager] = {}
+
+    def resolve_channel(self, channel_id: int) -> ChannelManager | None:
+        channel = self.ccache.get(channel_id, None)
+
+        if channel:
+            return channel
+
+        for channel in self.vchannels.values():
+            if channel.handles(channel_id):
+                self.ccache[channel_id] = channel
+                return channel
 
     async def start(self, *args, **kwargs) -> None:
         logger.info("Connecting to the database...")
@@ -26,6 +38,13 @@ class Bot(_Bot):
         await database.connect()
 
         logger.info("Connected to the database.")
+
+        channels = await Channel.objects.all()
+
+        for channel in channels:
+            self.vchannels[channel.name] = ChannelManager(self, channel)
+
+            await self.vchannels[channel.name].setup()
 
         await super().start(*args, **kwargs)
 

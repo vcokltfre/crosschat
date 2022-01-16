@@ -12,13 +12,17 @@ def main() -> None:
     intents.members = True
     intents.guild_messages = True
 
-    bot = Bot(intents=intents)
+    kwargs = {}
+
+    if guilds := environ.get("TEST_GUILDS"):
+        kwargs["test_guilds"] = [int(guild) for guild in guilds.split(",")]
+
+    bot = Bot(intents=intents, **kwargs)
 
     for ext in [
         "src.exts.errors",
         "src.exts.control.admin",
         "src.exts.control.core",
-        "src.exts.core.dispatcher",
         "src.exts.core.listener",
     ]:
         bot.load_extension(ext)

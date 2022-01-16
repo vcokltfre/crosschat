@@ -1,74 +1,63 @@
 from disnake import Message
 from disnake.ext.commands import Cog
 from disnake.ext.tasks import loop
-from loguru import logger
+from ormar import NoMatch
 
 from src import Bot
-from src.impl.database import Channel, ChannelMap
-
-from ..control.admin import Admin
+from src.impl.core import ChannelManager
+from src.impl.database import User
 
 
 class Listener(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-        self.mapping: dict[int, Channel] = {}
-        self.backmap: dict[int, list[int]] = {}
+        self.users: dict[int, User] = {}
 
-        self.cache_loop.start()
+    async def resolve_user(self, user_id: int, user_name: str) -> User:
+        user = self.users.get(user_id)
 
-    @Cog.listener()
-    async def on_channel_mapped(self, cmap: ChannelMap) -> None:
-        self.mapping[cmap.channel_id] = cmap.channel
-        if cmap.channel.id not in self.backmap:
-            self.backmap[cmap.channel.id] = []
-        self.backmap[cmap.channel.id].append(cmap.channel_id)
+        if user is None:
+            try:
+                user = await User.objects.first(id=user_id)
+            except NoMatch:
+                user = await User(id=user_id, name=str(user_name)).save()
 
-        logger.info(f"Updated channel mapping info for {cmap.channel_id} -> {cmap.channel.id}")
+            self.users[user.id] = user
 
-    @Cog.listener()
-    async def on_channel_unmapped(self, cmap: ChannelMap) -> None:
-        self.mapping.pop(cmap.channel_id, None)
-        self.backmap[cmap.channel.id].remove(cmap.channel_id)
-
-        logger.info(f"Removed channel mapping info for {cmap.channel_id}")
+        return user
 
     @loop(minutes=1)
-    async def cache_loop(self) -> None:
-        await self.bot.wait_until_ready()
-
-        cmaps = await ChannelMap.objects.all()
-
-        self.mapping = {}
-        self.backmap = {}
-
-        for mapping in cmaps:
-            self.mapping[mapping.channel_id] = mapping.channel
-            if mapping.channel.id not in self.backmap:
-                self.backmap[mapping.channel.id] = []
-            self.backmap[mapping.channel.id].append(mapping.channel_id)
-
-        logger.info(f"Updated channel mapping info for {len(cmaps)} channels")
+    async def flush_cache(self) -> None:
+        self.bot.ccache = {}
 
     @Cog.listener()
     async def on_message(self, message: Message) -> None:
-        if message.channel.id in self.mapping:
-            channel = self.mapping[message.channel.id]
-            self.bot.dispatch("channel_message", channel, self.backmap[channel.id], message)
+        channel = self.bot.resolve_channel(message.channel.id)
+
+        if channel is None or message.author.bot:
+            return
+
+        user = await self.resolve_user(message.author.id, message.author.name)
+
+        if user.banned:
+            return
+
+        await channel.send(message.author.name, message.author.display_avatar.url, message.content, message, user)
 
     @Cog.listener()
-    async def on_message_delete(self, message: Message) -> None:
-        return
+    async def on_message_edit(self, _: Message, after: Message) -> None:
+        channel = self.bot.resolve_channel(after.channel.id)
 
-        # Return for now, since people are using this maliciously.
+        if channel is None or after.author.bot:
+            return
 
-        if message.channel.id in self.mapping:
-            ac = self.bot.get_cog("Admin")  # type: ignore
+        user = await self.resolve_user(after.author.id, after.author.name)
 
-            ac: Admin
+        if user.banned:
+            return
 
-            await ac.delete_all(message)
+        await channel.edit(after.id, after.content)
 
 
 def setup(bot: Bot) -> None:

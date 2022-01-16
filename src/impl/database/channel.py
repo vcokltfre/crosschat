@@ -21,8 +21,7 @@ class Channel(Model):
         tablename = "channels"
 
     # pyright: reportGeneralTypeIssues=false
-    id: int = BigInteger(primary_key=True)
-    name: str = String(max_length=255)
+    name: str = String(max_length=255, primary_key=True)
     flags: int = BigInteger(default=0)
 
     @property
