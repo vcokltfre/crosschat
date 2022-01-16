@@ -1,9 +1,9 @@
-from disnake import CommandInteraction, TextChannel
+from disnake import CommandInteraction, Embed
 from disnake.ext.commands import Cog, Param, slash_command
 from ormar import NoMatch
 
 from src import Bot
-from src.impl.database import Channel, ChannelMap
+from src.impl.database import Channel, ChannelMap, Message
 from src.impl.utils import is_administrator
 
 
@@ -15,8 +15,36 @@ class Core(Cog):
         name="status",
         description="Get the status of the bot",
     )
+    @is_administrator()
     async def status(self, itr: CommandInteraction) -> None:
-        pass
+        await itr.response.defer()
+
+        channels = await Channel.objects.count()
+        dchannels = await ChannelMap.objects.count()
+        messages = await Message.objects.count()
+        umessages = await Message.objects.filter(Message.id == Message.original_id).count()
+
+        embed = Embed(
+            title="CrossChat Status",
+            colour=0x87CEEB,
+            description=(
+                f"Connected as {self.bot.user}\n"
+                f"Latency: {self.bot.latency * 1000:.2f}ms\n"
+                f"Guilds: {len(self.bot.guilds)}\n"
+            ),
+        )
+
+        embed.add_field(
+            name="Channels",
+            value=f"Virtual: {channels}\nDiscord: {dchannels}",
+        )
+
+        embed.add_field(
+            name="Messages",
+            value=f"Total: {messages}\nUnique: {umessages}",
+        )
+
+        await itr.send(embed=embed)
 
     @slash_command(
         name="setup",
