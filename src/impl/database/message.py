@@ -30,7 +30,7 @@ class Message(Model):
     user: User = ForeignKey(User)
     channel_id: int = BigInteger()
     guild_id: int = BigInteger()
-    webhook_id: int = BigInteger()
+    webhook_id: Optional[int] = BigInteger(nullable=True)
 
     @property
     def message_flags(self) -> MessageFlags:
