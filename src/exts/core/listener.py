@@ -11,21 +11,6 @@ class Listener(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-        self.users: dict[int, User] = {}
-
-    async def resolve_user(self, user_id: int, user_name: str) -> User:
-        user = self.users.get(user_id)
-
-        if user is None:
-            try:
-                user = await User.objects.first(id=user_id)
-            except NoMatch:
-                user = await User(id=user_id, name=str(user_name)).save()
-
-            self.users[user.id] = user
-
-        return user
-
     @loop(minutes=1)
     async def flush_cache(self) -> None:
         self.bot.ccache = {}
@@ -37,7 +22,7 @@ class Listener(Cog):
         if channel is None or message.author.bot:
             return
 
-        user = await self.resolve_user(message.author.id, message.author.name)
+        user = await self.bot.resolve_user(message.author.id, message.author.name)
 
         if user.banned:
             return
@@ -72,7 +57,7 @@ class Listener(Cog):
         if channel is None or after.author.bot:
             return
 
-        user = await self.resolve_user(after.author.id, after.author.name)
+        user = await self.bot.resolve_user(after.author.id, after.author.name)
 
         if user.banned:
             return

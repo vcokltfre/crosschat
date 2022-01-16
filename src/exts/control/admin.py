@@ -1,7 +1,7 @@
-from disnake import CommandInteraction, Embed
+from disnake import CommandInteraction, Embed, Message
 from disnake import User as DiscordUser
 from disnake import Webhook
-from disnake.ext.commands import Cog, Param, is_owner, slash_command
+from disnake.ext.commands import Cog, Param, is_owner, message_command, slash_command
 from ormar import NoMatch
 
 from src import Bot
@@ -112,6 +112,26 @@ class Admin(Cog):
         await vchannel.send("CrossChat", self.bot.user.display_avatar.url, embeds=[embed], content=None)  # type: ignore
 
         await itr.send(f"Announced to {channel} ({len(vchannel.channels)} subchannels)", ephemeral=True)
+
+    @message_command(name="Delete CC Message")
+    async def delete_message(self, itr: CommandInteraction, message: Message) -> None:
+        await itr.response.defer(ephemeral=True)
+
+        user = await self.bot.resolve_user(itr.author.id, itr.author.name)
+
+        if itr.author.id != message.author.id and not user.flags:
+            await itr.send("You do not have permission to delete messages.", ephemeral=True)
+            return
+
+        vchannel = self.bot.resolve_channel(message.channel.id)
+
+        if not vchannel:
+            await itr.send("Virtual channel does not exist for this message.", ephemeral=True)
+            return
+
+        await vchannel.delete(message.id)
+
+        await itr.send("Message deleted.", ephemeral=True)
 
 
 def setup(bot: Bot) -> None:

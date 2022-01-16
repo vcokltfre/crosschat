@@ -4,9 +4,10 @@ from aioredis import Redis, from_url
 from disnake.ext.commands import Bot as _Bot
 from fakeredis.aioredis import FakeRedis
 from loguru import logger
+from ormar import NoMatch
 
 from src.impl.core import ChannelManager
-from src.impl.database import Channel, database
+from src.impl.database import Channel, User, database
 
 
 class Bot(_Bot):
@@ -20,6 +21,20 @@ class Bot(_Bot):
 
         self.vchannels: dict[str, ChannelManager] = {}
         self.ccache: dict[int, ChannelManager] = {}
+        self.vusers: dict[int, User] = {}
+
+    async def resolve_user(self, user_id: int, user_name: str) -> User:
+        user = self.vusers.get(user_id)
+
+        if user is None:
+            try:
+                user = await User.objects.first(id=user_id)
+            except NoMatch:
+                user = await User(id=user_id, name=str(user_name)).save()
+
+            self.vusers[user.id] = user
+
+        return user
 
     def resolve_channel(self, channel_id: int) -> ChannelManager | None:
         channel = self.ccache.get(channel_id, None)

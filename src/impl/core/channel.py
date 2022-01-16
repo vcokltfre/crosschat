@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from disnake import AllowedMentions, Embed
 from disnake import Message as DiscordMessage
 from disnake import TextChannel, Webhook
+from disnake.http import Route
 from loguru import logger
 
 from src.impl.database import Channel, ChannelMap, Message, User
@@ -228,10 +229,23 @@ class ChannelManager:
 
         for message in messages:
             if not message.webhook_id:
-                return
+                try:
+                    route = Route(
+                        "DELETE",
+                        "/channels/{channel_id}/messages/{message_id}",
+                        channel_id=message.channel_id,
+                        message_id=message.id,
+                    )
+                    await self.bot.http.request(route)
+                except Exception as e:
+                    logger.error(
+                        f"Failed to delete message {message.id} on virtual channel {message.channel_id}:\n{format_exc()}"
+                    )
+                finally:
+                    continue
 
             try:
-                await self._delete_message(message.webhook_id, message.channel_id, message.id)
+                await self._delete_message(message.id, message.channel_id, message.webhook_id)
             except Exception as e:
                 logger.error(
                     f"Failed to delete message {message.id} on virtual channel {message.channel_id}:\n{format_exc()}"
