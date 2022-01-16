@@ -127,9 +127,13 @@ class Admin(Cog):
     async def delete_message(self, itr: CommandInteraction, message: Message) -> None:
         await itr.response.defer(ephemeral=True)
 
+        if not itr.guild:
+            await itr.send("This command can only be used in a server.", ephemeral=True)
+            return
+
         user = await self.bot.resolve_user(itr.author.id, itr.author.name)
 
-        if itr.author.id != message.author.id and not user.flags:
+        if itr.author.id != message.author.id and not (user.flags or itr.author.guild_permissions.manage_messages):  # type: ignore
             await itr.send("You do not have permission to delete messages.", ephemeral=True)
             return
 
