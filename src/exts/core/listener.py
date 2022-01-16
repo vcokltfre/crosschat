@@ -1,10 +1,9 @@
-from disnake import Message
+from disnake import Embed, Message
 from disnake.ext.commands import Cog
 from disnake.ext.tasks import loop
 from ormar import NoMatch
 
 from src import Bot
-from src.impl.core import ChannelManager
 from src.impl.database import User
 
 
@@ -43,7 +42,28 @@ class Listener(Cog):
         if user.banned:
             return
 
-        await channel.send(message.author.name, message.author.display_avatar.url, message.content, message, user)
+        kwargs = {"embeds": []}
+
+        if message.reference:
+            embed = Embed(
+                colour=0x87CEEB,
+                description=f"{message.reference.resolved.content[:500]}",  # type: ignore
+                timestamp=message.reference.resolved.created_at,  # type: ignore
+            )
+
+            embed.set_author(
+                name=message.reference.resolved.author.name,  # type: ignore
+                icon_url=message.reference.resolved.author.display_avatar.url,  # type: ignore
+            )
+
+            kwargs["embeds"].append(embed)
+
+        if not kwargs["embeds"]:
+            kwargs.pop("embeds")
+
+        await channel.send(
+            message.author.name, message.author.display_avatar.url, message.content, message, user, **kwargs
+        )
 
     @Cog.listener()
     async def on_message_edit(self, _: Message, after: Message) -> None:
