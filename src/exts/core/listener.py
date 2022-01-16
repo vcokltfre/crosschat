@@ -59,6 +59,10 @@ class Listener(Cog):
 
     @Cog.listener()
     async def on_message_delete(self, message: Message) -> None:
+        return
+
+        # Return for now, since people are using this maliciously.
+
         if message.channel.id in self.mapping:
             ac = self.bot.get_cog("Admin")  # type: ignore
 
