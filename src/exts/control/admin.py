@@ -1,3 +1,6 @@
+from os import environ
+
+from aiohttp import ClientSession
 from disnake import CommandInteraction, Embed, Message
 from disnake import User as DiscordUser
 from disnake import Webhook
@@ -14,6 +17,13 @@ class Admin(Cog):
         self.bot = bot
 
         self._webhook: Webhook | None = None
+
+    @property
+    def audit_hook(self) -> Webhook:
+        if self._webhook is None:
+            self._webhook = Webhook.from_url(environ["AUDIT_HOOK"], session=ClientSession())
+
+        return self._webhook
 
     @slash_command(
         name="channels",
@@ -132,6 +142,10 @@ class Admin(Cog):
         await vchannel.delete(message.id)
 
         await itr.send("Message deleted.", ephemeral=True)
+
+        await self.audit_hook.send(
+            f"Message {message.id} from {message.author} ({message.author.id}) deleted by {itr.author} ({itr.author.id})"
+        )
 
 
 def setup(bot: Bot) -> None:
