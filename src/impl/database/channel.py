@@ -1,3 +1,5 @@
+from typing import Optional
+
 from ormar import BigInteger, ForeignKey, Model, String
 
 from .metadata import database, metadata
@@ -36,4 +38,5 @@ class ChannelMap(Model):
 
     # pyright: reportGeneralTypeIssues=false
     channel_id: int = BigInteger(primary_key=True)
+    thread_id: Optional[int] = BigInteger(nullable=True)
     channel: Channel = ForeignKey(Channel)
