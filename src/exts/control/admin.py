@@ -110,7 +110,7 @@ class Admin(Cog):
 
         embed.set_author(name="System", icon_url="https://cdn.discordapp.com/emojis/931546588235595796.png")
 
-        await vchannel.send("CrossChat", self.bot.user.display_avatar.url, embeds=[embed])  # type: ignore
+        await vchannel.send("CrossChat", self.bot.user.display_avatar.url, embeds=[embed], content=None)  # type: ignore
 
         await itr.send(f"Announced to {channel} ({len(vchannel.channels)} subchannels)", ephemeral=True)
 
