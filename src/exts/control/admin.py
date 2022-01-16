@@ -1,6 +1,10 @@
+from os import environ
+
+from aiohttp import ClientSession
 from disnake import CommandInteraction, Embed
 from disnake import Message as DiscordMessage
 from disnake import User as DiscordUser
+from disnake import Webhook
 from disnake.ext.commands import Cog, Param, is_owner, message_command, slash_command
 from disnake.http import Route
 from loguru import logger
@@ -14,6 +18,16 @@ from src.impl.utils import is_moderator
 class Admin(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
+
+        self._webhook: Webhook | None = None
+
+    @property
+    def audit_hook(self) -> Webhook:
+        if not self._webhook:
+            session = ClientSession()
+
+            self._webhook = Webhook.from_url(environ["AUDIT_HOOK"], session=session)
+        return self._webhook
 
     @slash_command(
         name="channels",
@@ -89,6 +103,14 @@ class Admin(Cog):
             await itr.send(f"Message {message.id} is not a CrossChat message.", ephemeral=True)
 
         await itr.send("Message deleted.", ephemeral=True)
+
+        await self.audit_hook.send(
+            embed=Embed(
+                title=f"Message Deleted",
+                description=f"Message {message.id} deleted by {itr.author.id}",
+                colour=0x87CEEB,
+            ),
+        )
 
     async def delete_all(self, message: DiscordMessage) -> None:
         db_msg = await Message.objects.first(id=message.id)
