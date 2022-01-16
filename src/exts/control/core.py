@@ -22,7 +22,6 @@ class Core(Cog):
         channels = await Channel.objects.count()
         dchannels = await ChannelMap.objects.count()
         messages = await Message.objects.count()
-        umessages = await Message.objects.filter(Message.id == Message.original_id).count()
 
         embed = Embed(
             title="CrossChat Status",
@@ -41,7 +40,7 @@ class Core(Cog):
 
         embed.add_field(
             name="Messages",
-            value=f"Total: {messages}\nUnique: {umessages}",
+            value=f"Total: {messages}",
         )
 
         await itr.send(embed=embed)
