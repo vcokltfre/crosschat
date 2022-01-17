@@ -1,6 +1,7 @@
 from os import getenv
 
 from aioredis import Redis, from_url
+from cachingutils import acached, cached
 from disnake.ext.commands import Bot as _Bot
 from fakeredis.aioredis import FakeRedis
 from loguru import logger
@@ -23,6 +24,7 @@ class Bot(_Bot):
         self.ccache: dict[int, ChannelManager] = {}
         self.vusers: dict[int, User] = {}
 
+    @acached(timeout=30)
     async def resolve_user(self, user_id: int, user_name: str) -> User:
         user = self.vusers.get(user_id)
 
@@ -36,6 +38,7 @@ class Bot(_Bot):
 
         return user
 
+    @cached(timeout=10)
     def resolve_channel(self, channel_id: int) -> ChannelManager | None:
         channel = self.ccache.get(channel_id, None)
 

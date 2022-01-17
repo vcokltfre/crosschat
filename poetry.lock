@@ -132,6 +132,14 @@ python2 = ["typed-ast (>=1.4.3)"]
 uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
+name = "cachingutils"
+version = "1.0.1"
+description = "Utilities to make caching data easier"
+category = "main"
+optional = false
+python-versions = ">=3.10,<4.0"
+
+[[package]]
 name = "cfgv"
 version = "3.3.1"
 description = "Validate configuration and produce human readable error messages."
@@ -662,7 +670,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "bb93fa333da9d31f8040d28a8f94a644c3ccdd5f9b03f30b66d665db77b42def"
+content-hash = "2f6555eadcde7e93947959d35862b134fee65f4b02257426185ce28ee189a4a1"
 
 [metadata.files]
 aiohttp = [
@@ -794,6 +802,10 @@ attrs = [
 black = [
     {file = "black-21.12b0-py3-none-any.whl", hash = "sha256:a615e69ae185e08fdd73e4715e260e2479c861b5740057fde6e8b4e3b7dd589f"},
     {file = "black-21.12b0.tar.gz", hash = "sha256:77b80f693a569e2e527958459634f18df9b0ba2625ba4e0c2d5da5be42e6f2b3"},
+]
+cachingutils = [
+    {file = "cachingutils-1.0.1-py3-none-any.whl", hash = "sha256:651db5c5926b8be01fcb441a674ed5a11a0432f0b8d398de9c097a9d1f3838a4"},
+    {file = "cachingutils-1.0.1.tar.gz", hash = "sha256:0e88629ddb33bda4bd0940bdf7f67f3af8c84e4e4c3c58b2a1b9c91c547dc423"},
 ]
 cfgv = [
     {file = "cfgv-3.3.1-py2.py3-none-any.whl", hash = "sha256:c6a0883f3917a037485059700b9e75da2464e6c27051014ad85ba6aaa5884426"},
