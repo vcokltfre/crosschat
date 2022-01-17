@@ -133,7 +133,7 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "cachingutils"
-version = "1.0.1"
+version = "1.0.2"
 description = "Utilities to make caching data easier"
 category = "main"
 optional = false
@@ -804,8 +804,8 @@ black = [
     {file = "black-21.12b0.tar.gz", hash = "sha256:77b80f693a569e2e527958459634f18df9b0ba2625ba4e0c2d5da5be42e6f2b3"},
 ]
 cachingutils = [
-    {file = "cachingutils-1.0.1-py3-none-any.whl", hash = "sha256:651db5c5926b8be01fcb441a674ed5a11a0432f0b8d398de9c097a9d1f3838a4"},
-    {file = "cachingutils-1.0.1.tar.gz", hash = "sha256:0e88629ddb33bda4bd0940bdf7f67f3af8c84e4e4c3c58b2a1b9c91c547dc423"},
+    {file = "cachingutils-1.0.2-py3-none-any.whl", hash = "sha256:87c75259228317ea131ee24ab7265370356cff6feefe40d9690cdc56b8eb2cbd"},
+    {file = "cachingutils-1.0.2.tar.gz", hash = "sha256:b77ff1f080f2d25c831baa6daba8966c1de839cdb15cec1489db15ef2b5a5280"},
 ]
 cfgv = [
     {file = "cfgv-3.3.1-py2.py3-none-any.whl", hash = "sha256:c6a0883f3917a037485059700b9e75da2464e6c27051014ad85ba6aaa5884426"},
