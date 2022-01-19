@@ -43,6 +43,13 @@ class Listener(Cog):
 
             kwargs["embeds"].append(embed)
 
+        if message.attachments and (message.attachments[0].content_type or "").startswith("image/"):
+            embed = Embed()
+
+            embed.set_image(url=message.attachments[0].url)
+
+            kwargs["embeds"].append(embed)
+
         if not kwargs["embeds"]:
             kwargs.pop("embeds")
 
