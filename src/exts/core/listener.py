@@ -1,3 +1,4 @@
+from cachingutils import cached
 from disnake import Embed, Message
 from disnake.ext.commands import Cog
 from disnake.ext.tasks import loop
@@ -10,6 +11,13 @@ from src.impl.database import User
 class Listener(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
+
+    @staticmethod
+    @cached()
+    def shorten(message: str) -> str:
+        if len(message) <= 2000:
+            return message
+        return message[:1997] + "..."
 
     @loop(minutes=1)
     async def flush_cache(self) -> None:
@@ -30,15 +38,17 @@ class Listener(Cog):
         kwargs = {"embeds": []}
 
         if message.reference:
+            resolved: Message = message.reference.resolved  # type: ignore
+
             embed = Embed(
                 colour=0x87CEEB,
-                description=f"{message.reference.resolved.content[:500]}",  # type: ignore
-                timestamp=message.reference.resolved.created_at,  # type: ignore
+                description=f"{resolved.content[:500]}",
+                timestamp=resolved.created_at,
             )
 
             embed.set_author(
-                name=message.reference.resolved.author.name,  # type: ignore
-                icon_url=message.reference.resolved.author.display_avatar.url,  # type: ignore
+                name=resolved.author.name,
+                icon_url=resolved.author.display_avatar.url,
             )
 
             kwargs["embeds"].append(embed)
@@ -54,7 +64,12 @@ class Listener(Cog):
             kwargs.pop("embeds")
 
         await channel.send(
-            message.author.name, message.author.display_avatar.url, message.content, message, user, **kwargs
+            message.author.name,
+            message.author.display_avatar.url,
+            self.shorten(message.content),
+            message,
+            user,
+            **kwargs,
         )
 
     @Cog.listener()
