@@ -12,6 +12,8 @@ class Listener(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
+        self.flush_cache.start()
+
     @staticmethod
     @cached()
     def shorten(message: str) -> str:
