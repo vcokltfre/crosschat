@@ -10,6 +10,8 @@ from ormar import NoMatch
 from src.impl.core import ChannelManager
 from src.impl.database import Channel, User, database
 
+from .status import StatusHeartbeater
+
 
 class Bot(_Bot):
     def __init__(self, *args, **kwargs) -> None:
@@ -23,6 +25,8 @@ class Bot(_Bot):
         self.vchannels: dict[str, ChannelManager] = {}
         self.ccache: dict[int, ChannelManager] = {}
         self.vusers: dict[int, User] = {}
+
+        self._status = StatusHeartbeater()
 
     @acached(timeout=30)
     async def resolve_user(self, user_id: int, user_name: str) -> User:
@@ -56,6 +60,8 @@ class Bot(_Bot):
         await database.connect()
 
         logger.info("Connected to the database.")
+
+        self._status.run()
 
         channels = await Channel.objects.all()
 
