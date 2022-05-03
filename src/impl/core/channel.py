@@ -17,6 +17,10 @@ if TYPE_CHECKING:
 WEBHOOK_THRESHOLD = 1
 
 
+def filter_content(text: str) -> str:
+    return text.replace(")[", ")​[")
+
+
 class ChannelManager:
     def __init__(self, bot: Bot, channel: Channel) -> None:
         self.bot = bot
@@ -67,7 +71,7 @@ class ChannelManager:
         embeds = embeds or []
 
         return await webhooks[0].send(
-            content, username=username, avatar_url=avatar, embeds=embeds, allowed_mentions=allowed_mentions, wait=True
+            filter_content(content), username=username, avatar_url=avatar, embeds=embeds, allowed_mentions=allowed_mentions, wait=True
         )
 
     async def _edit_message(
@@ -95,7 +99,7 @@ class ChannelManager:
 
         embeds = embeds or []
 
-        await found.edit_message(message_id, content=content, embeds=embeds)
+        await found.edit_message(message_id, content=filter_content(content), embeds=embeds)
 
     async def _delete_message(self, message_id: int, channel_id: int, webhook_id: int) -> None:
         webhooks = await self._resolve_webhooks(channel_id, WEBHOOK_THRESHOLD)
