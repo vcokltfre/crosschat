@@ -18,7 +18,7 @@ WEBHOOK_THRESHOLD = 1
 
 
 def filter_content(text: str) -> str:
-    return text.replace(")[", ")​[")
+    return text.replace("](", ")​[")
 
 
 class ChannelManager:
