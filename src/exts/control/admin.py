@@ -62,7 +62,7 @@ class Admin(Cog):
         name: str = Param(desc="The name of the channel to delete"),
     ) -> None:
         try:
-            channel = await Channel.get(name=name)
+            channel = await Channel.objects.get(name=name)
         except NoMatch:
             await itr.send(f"Channel {name} does not exist.", ephemeral=True)
             return
