@@ -51,6 +51,7 @@ class Listener(Cog):
             embed.set_author(
                 name=resolved.author.name,
                 icon_url=resolved.author.display_avatar.url,
+                url=resolved.jump_url
             )
 
             kwargs["embeds"].append(embed)
