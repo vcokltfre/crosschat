@@ -1,5 +1,5 @@
 from cachingutils import cached
-from disnake import Embed, Message
+from disnake import Embed, Message, StickerFormatType
 from disnake.ext.commands import Cog
 from disnake.ext.tasks import loop
 from ormar import NoMatch
@@ -60,6 +60,15 @@ class Listener(Cog):
             embed = Embed()
 
             embed.set_image(url=message.attachments[0].url)
+
+            kwargs["embeds"].append(embed)
+
+        if message.stickers and message.stickers[0].format != StickerFormatType.lottie:
+            sticker = message.stickers[0]
+
+            embed = Embed(title=f"Sticker: `{sticker.name}`")
+
+            embed.set_image(url=sticker.url)
 
             kwargs["embeds"].append(embed)
 
