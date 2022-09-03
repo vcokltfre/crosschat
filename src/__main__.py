@@ -11,6 +11,7 @@ def main() -> None:
     intents.guilds = True
     intents.members = True
     intents.guild_messages = True
+    intents.message_content = True
 
     kwargs = {}
 
